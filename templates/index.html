@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>キャリア診断MVP</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <main class="page-shell">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Market Value Check</p>
+          <h1>あなたの市場価値、<br>今のままで大丈夫ですか？</h1>
+          <p class="hero-text">
+            3分の無料診断で、今の市場価値ランク、想定年収レンジ、このままだと詰まりやすい理由、
+            次に狙うべき職種をまとめて可視化します。
+          </p>
+          <ul class="hero-points">
+            <li>推定市場価値ランク</li>
+            <li>想定年収レンジ</li>
+            <li>5年後に詰まりやすい理由</li>
+            <li>30日でやるべき行動</li>
+          </ul>
+          <div class="hero-actions">
+            <a class="primary-button" href="#diagnosis-form">無料で市場価値を診断する</a>
+            <span class="sub-note">結果とメールアドレスはローカルのJSONに保存されます</span>
+          </div>
+          <p class="hero-warning">転職を急がなくても、自分の現在地を知らないまま働き続ける方が危険です。</p>
+        </div>
+        <div class="hero-card preview-card">
+          <p class="badge">診断後に見えること</p>
+          <div class="metric-preview">
+            <article class="metric-item">
+              <span>市場価値</span>
+              <strong>C〜A</strong>
+              <p>今のポジションがどれだけ伸びしろを持つかを見える化</p>
+            </article>
+            <article class="metric-item">
+              <span>想定年収</span>
+              <strong>330〜570万</strong>
+              <p>診断内の推定レンジとして現在地を把握</p>
+            </article>
+            <article class="metric-item">
+              <span>打ち手</span>
+              <strong>30日プラン</strong>
+              <p>次に何をやるかを迷わない状態まで落とし込み</p>
+            </article>
+          </div>
+          <p class="preview-note">占いではなく、回答傾向から「どう見せれば売れるか」に寄せた簡易レポートです。</p>
+        </div>
+      </section>
+
+      <section class="feature-grid">
+        <article class="feature-card">
+          <h3>未来に直結する指標だけ表示</h3>
+          <p>タイプ診断で終わらず、市場価値、年収レンジ、危機感、打ち手までまとめて出します。</p>
+        </article>
+        <article class="feature-card">
+          <h3>行動に変わる結果</h3>
+          <p>向いている職種だけでなく、今のままだと弱い理由と30日アクションを提示します。</p>
+        </article>
+        <article class="feature-card">
+          <h3>リード情報も残せる</h3>
+          <p>送信内容は `data/submissions.json` に蓄積されるので、反応検証や将来の追客導線に使えます。</p>
+        </article>
+      </section>
+
+      <section class="form-section" id="diagnosis-form">
+        <div class="section-header">
+          <p class="eyebrow">Start Diagnosis</p>
+          <h2>無料で現在地を確認する</h2>
+          <p>9問に答えると、市場価値ランク、想定年収レンジ、詰まりポイントを表示します。</p>
+        </div>
+
+        {% if errors %}
+          <div class="error-box">
+            <strong>入力不足があります。</strong>
+            <ul>
+              {% for error in errors %}
+                <li>{{ error }}</li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('diagnose') }}" class="diagnosis-form">
+          {% for question in questions %}
+            <section class="question-card">
+              <label class="question-label" for="{{ question.id }}">{{ question.label }}</label>
+              {% if question.help_text %}
+                <p class="field-note">{{ question.help_text }}</p>
+              {% endif %}
+
+              {% if question.type == "text" or question.type == "email" %}
+                <input
+                  id="{{ question.id }}"
+                  name="{{ question.id }}"
+                  type="{{ question.type }}"
+                  value="{{ values.get(question.id, '') }}"
+                  placeholder="{{ question.placeholder }}"
+                  required
+                >
+              {% elif question.type == "textarea" %}
+                <textarea
+                  id="{{ question.id }}"
+                  name="{{ question.id }}"
+                  rows="4"
+                  placeholder="{{ question.placeholder }}"
+                  required
+                >{{ values.get(question.id, '') }}</textarea>
+              {% elif question.type == "select" %}
+                <select id="{{ question.id }}" name="{{ question.id }}" required>
+                  <option value="">選択してください</option>
+                  {% for option in question.options %}
+                    <option
+                      value="{{ option.value }}"
+                      {% if values.get(question.id) == option.value %}selected{% endif %}
+                    >
+                      {{ option.label }}
+                    </option>
+                  {% endfor %}
+                </select>
+              {% elif question.type == "radio" %}
+                <div class="radio-group">
+                  {% for option in question.options %}
+                    <label class="radio-option">
+                      <input
+                        type="radio"
+                        name="{{ question.id }}"
+                        value="{{ option.value }}"
+                        {% if values.get(question.id) == option.value %}checked{% endif %}
+                        required
+                      >
+                      <span>{{ option.label }}</span>
+                    </label>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            </section>
+          {% endfor %}
+
+          <button type="submit" class="primary-button full-width">無料で市場価値レポートを見る</button>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

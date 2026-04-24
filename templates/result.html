@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>診断結果 | キャリア診断MVP</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body>
+    <main class="page-shell result-shell">
+      <section class="result-hero">
+        <p class="eyebrow">Market Value Result</p>
+        <h1>推定市場価値は {{ result.market_value_rank }}ランク</h1>
+        <p class="result-headline">{{ result.headline }}</p>
+        <p class="result-summary">{{ result.summary }}</p>
+        <div class="metric-strip">
+          <article class="metric-pill">
+            <span>市場価値スコア</span>
+            <strong>{{ result.market_value_score }}/100</strong>
+          </article>
+          <article class="metric-pill">
+            <span>想定年収レンジ</span>
+            <strong>{{ result.estimated_salary_range }}</strong>
+          </article>
+          <article class="metric-pill">
+            <span>緊急度</span>
+            <strong>{{ result.urgency_label }}</strong>
+          </article>
+          <article class="metric-pill">
+            <span>診断タイプ</span>
+            <strong>{{ result.type_name }}</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="result-grid">
+        <article class="result-card accent-card">
+          <h2>5年後に詰まりやすい理由</h2>
+          <p class="card-copy">{{ result.risk_summary }}</p>
+        </article>
+
+        <article class="result-card">
+          <h2>今伸ばすべき武器</h2>
+          <ul>
+            {% for point in result.leverage_points %}
+              <li>{{ point }}</li>
+            {% endfor %}
+          </ul>
+        </article>
+
+        <article class="result-card">
+          <h2>狙い目の職種</h2>
+          <ul>
+            {% for role in result.recommended_roles %}
+              <li>{{ role }}</li>
+            {% endfor %}
+          </ul>
+        </article>
+
+        <article class="result-card">
+          <h2>次に取る行動</h2>
+          <ul>
+            {% for action in result.actions %}
+              <li>{{ action }}</li>
+            {% endfor %}
+          </ul>
+        </article>
+
+        <article class="result-card">
+          <h2>今回の入力サマリー</h2>
+          <dl class="summary-list">
+            <div>
+              <dt>年代</dt>
+              <dd>{{ answers.age_group }}</dd>
+            </div>
+            <div>
+              <dt>現在の職種</dt>
+              <dd>{{ answers.current_role }}</dd>
+            </div>
+            <div>
+              <dt>理想の1年後</dt>
+              <dd>{{ answers.future_image }}</dd>
+            </div>
+            <div>
+              <dt>登録メール</dt>
+              <dd>{{ result.registered_email }}</dd>
+            </div>
+          </dl>
+        </article>
+      </section>
+
+      <section class="next-step-card">
+        <h2>次の一手</h2>
+        <p>{{ result.next_step }}</p>
+        <div class="mail-status {% if result.mail_delivery.delivered %}mail-success{% else %}mail-warning{% endif %}">
+          <strong>自動メール配信:</strong>
+          <span>{{ result.mail_delivery.message }}</span>
+          {% if result.mail_delivery.preview_path %}
+            <span class="mail-meta">保存先: {{ result.mail_delivery.preview_path }}</span>
+          {% endif %}
+        </div>
+        <p class="disclaimer">{{ result.disclaimer }}</p>
+        <p class="sub-note">登録メールはローカル保存済みです。メール内リンクからクリックと相談希望を計測できます。</p>
+        <a class="primary-button" href="{{ url_for('index') }}#diagnosis-form">もう一度診断する</a>
+      </section>
+    </main>
+  </body>
+</html>
