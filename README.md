@@ -30,7 +30,7 @@ npm test
 npm run build
 ```
 
-`npm run build` はNext.jsの静的出力を生成し、Sitesが公開できる `dist/` へ自動配置します。
+`npm run build` はSites標準のvinextビルドを生成し、Cloudflare Worker互換の `dist/` を作成します。
 
 ## できること
 

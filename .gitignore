@@ -5,7 +5,10 @@ __pycache__/
 data/email_previews/
 node_modules/
 .next/
+.vinext/
 out/
 dist/
+.wrangler/
+next-env.d.ts
 .DS_Store
 *.tsbuildinfo
