@@ -30,6 +30,8 @@ npm test
 npm run build
 ```
 
+`npm run build` はNext.jsの静的出力を生成し、Sitesが公開できる `dist/` へ自動配置します。
+
 ## できること
 
 - 1ページLPを表示

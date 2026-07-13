@@ -5,5 +5,7 @@ __pycache__/
 data/email_previews/
 node_modules/
 .next/
+out/
+dist/
 .DS_Store
 *.tsbuildinfo

@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "node scripts/prepare_site_output.mjs",
     "start": "next start",
     "test": "node --test tests/diagnosis.test.mjs"
   },
