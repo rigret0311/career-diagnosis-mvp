@@ -16,10 +16,14 @@ async function serve(request, env) {
     });
   }
 
-  let response = await env.ASSETS.fetch(request);
+  const url = new URL(request.url);
+  const firstAssetUrl = new URL(url);
+  if (firstAssetUrl.pathname === "/") firstAssetUrl.pathname = "/index.html";
+
+  let response = await env.ASSETS.fetch(new Request(firstAssetUrl, request));
   const acceptsHtml = request.headers.get("Accept")?.includes("text/html");
-  if (response.status === 404 && request.method === "GET" && acceptsHtml) {
-    response = await env.ASSETS.fetch(new Request(new URL("/", request.url), request));
+  if (response.status === 404 && acceptsHtml) {
+    response = await env.ASSETS.fetch(new Request(new URL("/index.html", request.url), request));
   }
 
   const headers = new Headers(response.headers);
