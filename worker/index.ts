@@ -23,13 +23,19 @@ interface ExecutionContext {
 
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-    const url = new URL(request.url);
+    const isHeadRequest = request.method === "HEAD";
+    const routedRequest = isHeadRequest
+      ? new Request(request.url, { method: "GET", headers: request.headers })
+      : request;
+    const url = new URL(routedRequest.url);
+    let response: Response;
+
     if (url.pathname === "/_vinext/image") {
       const allowedWidths = [...DEFAULT_DEVICE_SIZES, ...DEFAULT_IMAGE_SIZES];
-      return handleImageOptimization(
-        request,
+      response = await handleImageOptimization(
+        routedRequest,
         {
-          fetchAsset: (path) => env.ASSETS.fetch(new Request(new URL(path, request.url))),
+          fetchAsset: (path) => env.ASSETS.fetch(new Request(new URL(path, routedRequest.url))),
           transformImage: async (body, { width, format, quality }) => {
             const result = await env.IMAGES.input(body)
               .transform(width > 0 ? { width } : {})
@@ -39,8 +45,19 @@ const worker = {
         },
         allowedWidths,
       );
+    } else {
+      response = await handler.fetch(routedRequest, env, ctx);
     }
-    return handler.fetch(request, env, ctx);
+
+    const headers = new Headers(response.headers);
+    headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+    headers.set("X-Content-Type-Options", "nosniff");
+    headers.set("X-Frame-Options", "DENY");
+    return new Response(isHeadRequest ? null : response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
   },
 };
 
