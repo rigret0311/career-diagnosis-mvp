@@ -3,3 +3,7 @@ __pycache__/
 *.pyc
 .env
 data/email_previews/
+node_modules/
+.next/
+.DS_Store
+*.tsbuildinfo
